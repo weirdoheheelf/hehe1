@@ -26,14 +26,10 @@
     </select>
     
     <select id="selectMoviePlacingRate" resultType="com.example.cinema.po.PlacingRate">
-        select movie.id as movieId, placingRate,name from movie
+        select movie_id as movieId, placingRate,name from
+            (select * from movie where start_date between #{date} and #{nextdate}) m
         left join
-          (select movie_id as movieId,sum(fare) as placingRate from schedule
-          right join
-          (select schedule_id from ticket where state=1) t
-          on schedule.id=t.schedule_id group by movie_id) s
-        on s.movieId=movie.id
-
+            (select )
     </select>
 
 </mapper>

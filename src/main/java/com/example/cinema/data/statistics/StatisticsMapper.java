@@ -1,7 +1,6 @@
 package com.example.cinema.data.statistics;
 
 import com.example.cinema.po.*;
-import com.example.cinema.vo.PlacingRateVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,9 +35,18 @@ public interface StatisticsMapper {
     List<AudiencePrice> selectAudiencePrice(@Param("date") Date date, @Param("nextDate") Date nextDate);
 
     /**
-     * 查询某天所有电影的上座率
+     * 查询某天所有电影的影厅
      * @param date
+     * @param movieId
      * @return
      */
-    List<PlacingRate> selectMoviePlacingRate(@Param("date") Date date,@Param("nextDate") Date nextDate);
+    List<Hall> selectMovieHall(int movieId,@Param("date") Date date, @Param("nextDate") Date nextDate);
+
+    /**
+     * 查询某天所有电影的观众人次
+     * @param date
+     * @param movieId
+     * @return
+     */
+    int selectMovieAudienceNum(int movieId,@Param("date") Date date, @Param("nextDate") Date nextDate);
 }

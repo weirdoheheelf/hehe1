@@ -1,19 +1,12 @@
 package com.example.cinema.blImpl.statistics;
 
-import com.example.cinema.bl.management.HallService;
-import com.example.cinema.bl.sales.TicketService;
 import com.example.cinema.bl.statistics.StatisticsService;
-import com.example.cinema.blImpl.management.hall.HallServiceForBl;
-import com.example.cinema.data.management.HallMapper;
-import com.example.cinema.data.management.ScheduleMapper;
-import com.example.cinema.data.sales.TicketMapper;
 import com.example.cinema.data.statistics.StatisticsMapper;
 import com.example.cinema.po.*;
 import com.example.cinema.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -92,7 +85,27 @@ public class StatisticsServiceImpl implements StatisticsService {
             requireDate = simpleDateFormat.parse(simpleDateFormat.format(requireDate));
 
             Date nextDate = getNumDayAfterDate(requireDate, 1);
-            return ResponseVO.buildSuccess(placingRateList2PlacingRateVOList(statisticsMapper.selectMoviePlacingRate(requireDate,nextDate)));
+            List<MovieScheduleTime> movieScheduleTimeList=statisticsMapper.selectMovieScheduleTimes(requireDate, nextDate);
+            List<PlacingRateVO> placingRateVOList=new ArrayList<>();
+            for (MovieScheduleTime movieScheduleTime:movieScheduleTimeList){
+                int audienceNum=statisticsMapper.selectMovieAudienceNum(movieScheduleTime.getMovieId(),requireDate, nextDate);
+                int scheduleTime=movieScheduleTime.getTime();
+                List<Hall> halls=statisticsMapper.selectMovieHall(movieScheduleTime.getMovieId(),requireDate, nextDate);
+                int seatNum=0;
+                for (Hall hall:halls){
+                    int row=hall.getRow();
+                    int column=hall.getColumn();
+                    seatNum+=row*column;
+                }
+                double placingRate=(double)((audienceNum/scheduleTime)/seatNum)*100;
+                String result=placingRate+"%";
+                PlacingRateVO placingRateVO=new PlacingRateVO();
+                placingRateVO.setId(movieScheduleTime.getMovieId());
+                placingRateVO.setName(movieScheduleTime.getName());
+                placingRateVO.setPlacingRate(result);
+                placingRateVOList.add(placingRateVO);
+            }
+            return ResponseVO.buildSuccess(placingRateVOList);
         }catch (Exception e){
             e.printStackTrace();
             return ResponseVO.buildFailure("失败");
@@ -136,11 +149,4 @@ public class StatisticsServiceImpl implements StatisticsService {
         return movieTotalBoxOfficeVOList;
     }
 
-    private List<PlacingRateVO> placingRateList2PlacingRateVOList(List<PlacingRate> placingRateList){
-        List<PlacingRateVO> placingRateVOList=new ArrayList<>();
-        for (PlacingRate placingRate:placingRateList){
-            placingRateVOList.add(new PlacingRateVO(placingRate));
-        }
-        return placingRateVOList;
-    }
 }

@@ -24,12 +24,15 @@
               (select id from schedule where start_time between #{date} and #{nextDate}) and state = 1) t
         on schedule.id = schedule_id group by user_id
     </select>
-    
-    <select id="selectMoviePlacingRate" resultType="com.example.cinema.po.PlacingRate">
-        select movie_id as movieId, placingRate,name from
-            (select * from movie where start_date between #{date} and #{nextdate}) m
-        left join
-            (select )
+
+    <select id="selectMovieHall" resultType="com.example.cinema.po.Hall">
+        select id,name,row,`column` from hall where id in
+              (select * from schedule where start_time between #{date} and #{nextDate} and movie_id=#{movieId})
+    </select>
+
+    <select id="selectMovieAudienceNum" resultType="int">
+        select count(*) from ticket where schedule_id in
+            (select id from schedule where start_time between #{date} and #{nextDate} and movie_id=#{movieId}) and state=1
     </select>
 
 </mapper>

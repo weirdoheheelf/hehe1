@@ -1,10 +1,5 @@
 package com.example.cinema.vo;
 
-import com.example.cinema.po.PlacingRate;
-
-import java.util.Date;
-import java.util.List;
-
 public class PlacingRateVO {
     /**
      * 电影id
@@ -19,10 +14,7 @@ public class PlacingRateVO {
      */
     private String name;
 
-    public PlacingRateVO(PlacingRate placingRate){
-        this.movieId=placingRate.getId();
-        this.placingRate=placingRate.getPlacingRate();
-        this.name=placingRate.getName();
+    public PlacingRateVO(){
     }
 
     public Integer getId(){ return movieId;}
